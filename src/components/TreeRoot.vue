@@ -2,7 +2,11 @@
   <component
     :is="tag"
     role="tree"
-    :class="{'tree': true, 'tree-loading': this.loading, 'tree--draggable' : !!this.draggableNode}"
+    :class="{
+      'tree': true, 
+      'tree-loading': this.loading, 
+      'tree--draggable' : !!this.draggableNode,
+    }"
   >
     <template v-if="filter && matches.length == 0">
       <div
@@ -13,6 +17,9 @@
     <template v-else>
       <ul
         class="tree-root"
+        :class="{
+          'tree-root--multi': options.multiTree
+        }"
         @dragstart="onDragStart"
       >
         <template v-if="opts.filter.plainList && matches.length > 0">
@@ -162,6 +169,7 @@
     overflow: auto;
   }
 
+
   .tree-root,
   .tree-children {
     list-style: none;
@@ -172,6 +180,15 @@
   .tree > .tree-filter-empty {
     padding: 3px;
     box-sizing: border-box;
+  }
+
+  .tree-root.tree-root--multi {
+      display: flex;
+      align-items: baseline;
+  }
+
+  .tree-root.tree-root--multi > .tree-node  {
+    flex: 0 0 50%;
   }
 
   .tree.tree--draggable .tree-node:not(.selected) > .tree-content:hover {

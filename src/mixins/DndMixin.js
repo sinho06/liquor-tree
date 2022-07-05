@@ -1,8 +1,12 @@
+import { convertCompilerOptionsFromJson } from "typescript"
+
 const DropPosition = {
   ABOVE: 'drag-above',
   BELOW: 'drag-below',
   ON: 'drag-on'
 }
+
+const outsideDropPosition = [DropPosition.ABOVE, DropPosition.BELOW]
 
 function isMovingStarted (event, start) {
   return Math.abs(event.clientX - start[0]) > 5 || Math.abs(event.clientY - start[1]) > 5
@@ -147,6 +151,10 @@ export default {
         window.removeEventListener('mousemove', onMouseMove, true)
       }
 
+      const isCreatingNewTreeRootNode = (destinationNode, dropPosition) => {
+        return destinationNode.parent === null && outsideDropPosition.includes(dropPosition)
+      }
+
       const onMouseUp = (e) => {
         if (!this.$$startDragPosition) {
           e.stopPropagation()
@@ -235,7 +243,10 @@ export default {
 
           const isDropable = this.$$dropDestination.isDropable() && cbResult !== false
 
-          if (!isDropable && dropPosition === DropPosition.ON) {
+          if (
+            !isDropable && dropPosition === DropPosition.ON ||
+            this.tree.options.blockNewRootNodes && isCreatingNewTreeRootNode(this.$$dropDestination, dropPosition)
+          ) {
             dropPosition = null
           }
 

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <title>Liquor Tree: Drag & Drop - 2 Trees</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/menu.js"></script>
+
+    <!-- first import Vue -->
+    <!-- <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
+    <script src="../assets/vue.js"></script>
+    <script src="/liquor-tree.umd.js"></script>
+
+
+    <style>
+      .demo-tree {
+        width: 50%;
+      }
+
+      .tree.tree-loading {
+        width: 300px;
+        height: 300px;
+        background: #fff no-repeat url(/assets/img/loading.gif) center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hello">
+        Drag & Drop 2 Trees.
+    </div>
+
+    <div id="app">
+      <div class="">
+        <div class="">
+          <div class="example-description">
+            <p>Overriding default structure of tree data</p>
+          </div>
+
+          <div class="example-tree">
+            <tree
+              :data="treeData"
+              :options="treeOptions3"
+            >
+              <div class="tree-scope" slot-scope="{ node }">
+                - {{ node.text }} -
+              </div>
+            </tree>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      new Vue({
+        el: '#app',
+        data: () => ({
+          /* example 3 */
+          treeData: getTreeData2(),
+          treeOptions3: {
+            blockNewRootNodes: true,
+            multiTree: true,
+            propertyNames: {
+              text: 'MY_TEXT',
+              children: 'KIDS',
+              state: 'OPTIONS'
+            },
+            deletion: true,
+            dnd: {
+              onDragStart(node) {
+                return node.data.isNotDraggable !== true && node.parent !== null
+              },
+              onDragOn(targetNode, destinationNode, dropPosition) {
+                console.log('onDragOn', targetNode.text, destinationNode.text, dropPosition)
+                return destinationNode.data.isNotDroppable !== true
+              },
+              onDragFinish(targetNode, destinationNode, dropPosition) {
+                console.log('onDragFinish', `Target: ${targetNode.text}`, `Destination: ${destinationNode.text}`, dropPosition)
+                return destinationNode.data.isNotDroppable !== true
+              }
+            },
+            checkbox: true
+          }
+        }),
+
+        methods: {
+          initTree2() {
+            this.treeData2 = new Promise(resolve => {
+              setTimeout(() => resolve(getTreeData1()), 2600)
+            })
+
+            this.treeData2.then(data => {
+              data[0].state = {}
+            })
+          },
+        }
+      })
+
+      function getTreeData2() {
+        return [
+          {
+            id: 1,
+            MY_TEXT: 'Available',
+            OPTIONS: { expanded: true, draggable: false },
+            KIDS: [
+              { id: 10, MY_TEXT: 'Item 1', OPTIONS: { checked: true } },
+              { id: 20, MY_TEXT: 'Item 2'},
+              { id: 30, MY_TEXT: 'Item 3' },
+              { id: 40, MY_TEXT: 'Item 4', KIDS: [
+                { id: 41, MY_TEXT: 'Item 4.1', OPTIONS: { checked: true }  },
+                { id: 42, MY_TEXT: 'Item 4.2', OPTIONS: { checked: true }  },
+                { id: 43, MY_TEXT: 'Item 4.3', OPTIONS: { checked: true }  },
+                { id: 44, MY_TEXT: 'Item 4.4', OPTIONS: { checked: true }  }
+              ]},
+              { id: 50, MY_TEXT: 'Item 5' }
+            ]
+          },
+          {
+            id: 2,
+            MY_TEXT: 'Active',
+            OPTIONS: { expanded: true, draggable: false },
+            KIDS: []
+          },
+        ]
+      }
+    </script>
+
+  </body>
+</html>
